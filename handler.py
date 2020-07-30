@@ -27,8 +27,8 @@ def hello(event, context):
 
     logger.info('### BODY')
     logger.info(body)
-
-    url = "http://ahjikan-shop.com/lp_nd/goboutea/images/key_benpi2.jpg"  
+    
+    url = body.get('url')
     
     response = requests.get(url)
     image = response.content
@@ -50,7 +50,7 @@ def hello(event, context):
     dominant_colors= response.dominant_colors
     print(dominant_colors)
 
-    fwl = ['しっとり輝く', 'ホワイトニング', '美肌', '肌がきれいになる', '赤ちゃんのような',
+    fwl = ['キレイ','しっとり輝く', 'ホワイトニング', '美肌', '肌がきれいになる', '赤ちゃんのような',
       'デリケートゾーン', 'すっぴん', '健康的なお肌', 'エイジングケア', 'ハリコシ実感',
       'ダイエット', '刃リハリ', '手汗', '竹炭', 'インナーケア', 'スキニーが履けない',
       'レギンス', '美脚&美尻&美腹', 'ヒップアップ', '骨盤矯正', 'バストケア',
@@ -69,11 +69,11 @@ def hello(event, context):
       '無菌獎蛋', 'コルジセピン', 'keratin', '保湿', '高純度', '女性誌', '潤い、ハリ肌!',
       '美白ケア', 'シンデレラ', '母乳', '美容液', '肌老化', '先輩ママ', '健康を育む',
       '美習慣!', '気持ちの前向きサプリ', 'その髪、水素で美しく', '敏感肌用ソープ',
-      '満足度']
+      '満足度', 'インナーケア']
     
     # male dictionary of words
     mwl = ['男肌', 'デキる男', 'お通じ改善', 'キャビキシル', 'ピディオキシジル', 'ロ臭',
-       '筋肉をデザイン', '親子満足度', ' プロテオグリカン']
+       '筋肉をデザイン', '親子満足度', ' プロテオグリカン', '頭皮', '满足','エネルギー']
 
 
     Farr = array([[4.49078023e-01, 3.52895796e-01, 2.49000000e+02, 2.45000000e+02,
@@ -140,13 +140,15 @@ def hello(event, context):
                               np.transpose(np.array(B).reshape(-1,1))), axis =0)
         Tarr = np.transpose(arr)
         ED = euclidean_distances(Tarr, Farr).mean()
-        z = (ED-160.8980699302674)/(171.84327257462073-160.8980699302674)
-        if z < 0.5:
+        z = abs(ED-160.8980699302674)/(171.84327257462073-160.8980699302674)
+        print(z)
+        if z < 1.5:
             result = 'For Woman'
         else:
             result = 'For man'
 
     elif any(mw in text for mw in mwl):
+        print('MW')
 
         PF = [] # pixel fraction
         SV = [] # score value
@@ -167,18 +169,20 @@ def hello(event, context):
         Tarr = np.transpose(arr)
         ED = euclidean_distances(Tarr, Marr).mean()
         z = (ED-160.8980699302674)/(171.84327257462073-160.8980699302674)
-        if z < 0.5:
+        if z < 1.55:
             result = 'For man'
         else:
-            result = 'For Woman'                                                               
+            result = 'For Woman' 
     else:
         result = 'Else'
+
                 
 
     response = {
         'statusCode': 200,
         'data': {
-          'result': result
+          'result': result,
+          'url': url
         }
     }
     print(response)
